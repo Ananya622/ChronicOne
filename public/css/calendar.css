@@ -1,0 +1,688 @@
+/* ==========================================================================
+   calendar.css — GitHub-Style Monthly Heatmap & Adherence Analytics
+   Page: public/calendar.html
+   Clean layout fitting naturally beside the ChronicOne sidebar (using .main-wrapper)
+   ========================================================================== */
+
+/* Main Calendar Content Container */
+.calendar-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   1. Calendar Header Card & Month Navigation
+   ========================================================================== */
+.calendar-header-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 22px 28px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.calendar-title-group h1 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Month Navigation Controls */
+.month-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.month-display-pill {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  min-width: 160px;
+  text-align: center;
+  padding: 7px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  user-select: none;
+}
+
+.btn-nav-month {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.btn-nav-month:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--primary-teal);
+  color: var(--primary-teal);
+  transform: translateY(-1px);
+}
+
+.btn-nav-month.btn-today {
+  padding: 8px 14px;
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--primary-teal);
+  border-color: rgba(13, 148, 136, 0.3);
+}
+
+.btn-nav-month.btn-today:hover {
+  background: rgba(13, 148, 136, 0.22);
+}
+
+/* ==========================================================================
+   2. Heatmap Grid Card & Days Matrix
+   ========================================================================== */
+.calendar-grid-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 24px 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.calendar-grid-wrapper {
+  width: 100%;
+}
+
+/* Weekday Labels Row (Mon - Sun) */
+.weekday-header-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.weekday-header-cell {
+  font-family: var(--font-heading);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 0;
+}
+
+/* Monthly Days Grid: Exactly 7 equal columns */
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+/* Compact, Balanced Calendar Day Cell */
+.cal-day-cell {
+  min-height: 52px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  user-select: none;
+}
+
+.cal-day-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+}
+
+.cal-day-number {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cal-day-pill-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: right;
+  line-height: 1;
+}
+
+/* Heatmap States & Color Mapping */
+
+/* 1. No Check-in (Neutral subtle empty background) */
+.cal-day-cell.no-checkin {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+body.light-theme .cal-day-cell.no-checkin {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+  color: #64748B;
+}
+
+/* 2. Full Adherence (100% - Strong Emerald Green) */
+.cal-day-cell.full {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34D399;
+}
+.cal-day-cell.full:hover {
+  border-color: #10B981;
+  background: rgba(16, 185, 129, 0.32);
+}
+body.light-theme .cal-day-cell.full {
+  background: #D1FAE5;
+  border-color: #6EE7B7;
+  color: #047857;
+}
+
+/* 3. Partial Adherence (50-99% - Vibrant Teal) */
+.cal-day-cell.partial {
+  background: rgba(13, 148, 136, 0.22);
+  border-color: rgba(13, 148, 136, 0.45);
+  color: #2DD4BF;
+}
+.cal-day-cell.partial:hover {
+  border-color: #0D9488;
+  background: rgba(13, 148, 136, 0.32);
+}
+body.light-theme .cal-day-cell.partial {
+  background: #CCFBF1;
+  border-color: #5EEAD4;
+  color: #0F766E;
+}
+
+/* 4. Low Adherence (1-49% - Warm Amber / Orange) */
+.cal-day-cell.low {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+}
+.cal-day-cell.low:hover {
+  border-color: #F59E0B;
+  background: rgba(245, 158, 11, 0.3);
+}
+body.light-theme .cal-day-cell.low {
+  background: #FEF3C7;
+  border-color: #FCD34D;
+  color: #B45309;
+}
+
+/* 5. Missed Day (0% - Muted Rose / Grey Accent) */
+.cal-day-cell.missed {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.28);
+  color: #FB7185;
+}
+.cal-day-cell.missed:hover {
+  border-color: #F43F5E;
+  background: rgba(244, 63, 94, 0.22);
+}
+body.light-theme .cal-day-cell.missed {
+  background: #FFE4E6;
+  border-color: #FDA4AF;
+  color: #BE123C;
+}
+
+/* 6. Adjacent Month Padding Cell */
+.cal-day-cell.padding-cell {
+  opacity: 0.2;
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+}
+.cal-day-cell.padding-cell:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* 7. Today's Date Indicator Ring */
+.cal-day-cell.is-today {
+  box-shadow: 0 0 0 2px var(--primary-teal);
+  font-weight: bold;
+}
+.cal-day-cell.is-today .cal-day-number::after {
+  content: ' •';
+  color: var(--primary-teal);
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   3. Heatmap Legend
+   ========================================================================== */
+.heatmap-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legend-swatch.full {
+  background: rgba(16, 185, 129, 0.7);
+  border-color: #10B981;
+}
+
+.legend-swatch.partial {
+  background: rgba(13, 148, 136, 0.7);
+  border-color: #0D9488;
+}
+
+.legend-swatch.low {
+  background: rgba(245, 158, 11, 0.7);
+  border-color: #F59E0B;
+}
+
+.legend-swatch.missed {
+  background: rgba(244, 63, 94, 0.5);
+  border-color: #F43F5E;
+}
+
+.legend-swatch.no-checkin {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+body.light-theme .legend-swatch.no-checkin {
+  background: #E2E8F0;
+  border-color: #CBD5E1;
+}
+
+/* ==========================================================================
+   4. Monthly Summary Card
+   ========================================================================== */
+.monthly-summary-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 22px 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.summary-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.summary-stat-pill {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.summary-supportive-message {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: rgba(13, 148, 136, 0.08);
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   5. Floating Tooltip
+   ========================================================================== */
+.calendar-tooltip {
+  position: fixed;
+  z-index: 1000;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-dropdown);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  pointer-events: none;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  min-width: 160px;
+}
+
+.calendar-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-date {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 4px;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   6. Day Details Modal Styles
+   ========================================================================== */
+.modal-card-day-details {
+  max-width: 480px;
+}
+
+.day-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Day Summary Banner (Adherence + Classification) */
+.day-summary-banner {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-adherence-num {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.day-adherence-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+/* Day Section Cards */
+.day-section-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.day-section-header {
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Habit Adherence Rows */
+.day-habits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-habit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.day-habit-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.day-habit-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.day-habit-pct-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+}
+
+.day-habit-pct-badge.full {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34D399;
+}
+
+.day-habit-pct-badge.partial {
+  background: rgba(13, 148, 136, 0.18);
+  color: #2DD4BF;
+}
+
+.day-habit-pct-badge.low {
+  background: rgba(245, 158, 11, 0.18);
+  color: #FBBF24;
+}
+
+.day-habit-pct-badge.missed {
+  background: rgba(244, 63, 94, 0.15);
+  color: #FB7185;
+}
+
+/* Note Quote Box */
+.day-notes-box {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--primary-teal);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-style: italic;
+}
+
+.day-notes-empty {
+  font-size: 0.82rem;
+  color: var(--text-subtle);
+  font-style: normal;
+}
+
+/* Biomarker & Mood Chips Grid */
+.day-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.day-chip-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-chip-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.day-chip-value {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Empty State Box for No Check-in Days */
+.day-empty-box {
+  text-align: center;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-empty-icon {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.day-empty-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.day-empty-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  max-width: 320px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+  .calendar-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 20px;
+  }
+
+  .month-nav-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .month-display-pill {
+    min-width: 130px;
+    font-size: 0.95rem;
+    padding: 6px 10px;
+  }
+
+  .calendar-grid-card {
+    padding: 16px;
+  }
+
+  .cal-day-cell {
+    min-height: 44px;
+    height: 48px;
+    padding: 4px 6px;
+  }
+
+  .summary-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
