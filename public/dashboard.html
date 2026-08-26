@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChronicOne — Adaptive Health & Habit Dashboard</title>
+  <meta name="description"
+    content="Chronic condition habit streak tracker with grace days, relapse logic, and personalized health metrics.">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Dedicated Stylesheet -->
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+  <!-- Ambient Glow -->
+  <div class="ambient-glow-mesh"></div>
+
+  <!-- Main App Layout -->
+  <div class="app-container">
+
+    <!-- ====================================================================
+         1. SIDEBAR NAVIGATION
+         ==================================================================== -->
+    <aside class="sidebar" id="appSidebar">
+
+      <!-- Brand Header -->
+      <div class="sidebar-header">
+        <i data-lucide="shield-check" class="brand-icon"></i>
+        <span class="brand-title">ChronicOne</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-link active">
+          <i data-lucide="home"></i>
+          <span>Home</span>
+        </a>
+
+        <button class="nav-link" data-nav="checkin" id="navCheckinBtn">
+          <i data-lucide="calendar-check"></i>
+          <span>Daily Check-in</span>
+          <span class="nav-badge-pill" id="navCheckinBadge">Today</span>
+        </button>
+
+        <a href="calendar.html" class="nav-link" id="navCalendarLink">
+          <i data-lucide="calendar"></i>
+          <span>Calendar</span>
+        </a>
+
+        <button class="nav-link" data-nav="progress">
+          <i data-lucide="trending-up"></i>
+          <span>Progress</span>
+        </button>
+
+        <button class="nav-link" data-nav="health">
+          <i data-lucide="activity"></i>
+          <span>Health</span>
+        </button>
+
+        <button class="nav-link" data-nav="wellness">
+          <i data-lucide="smile"></i>
+          <span>Wellness</span>
+        </button>
+
+        <button class="nav-link" data-nav="recovery">
+          <i data-lucide="refresh-cw"></i>
+          <span>Recovery</span>
+        </button>
+
+        <button class="nav-link" data-nav="achievements">
+          <i data-lucide="award"></i>
+          <span>Achievements</span>
+        </button>
+
+        <button class="nav-link" data-nav="journal">
+          <i data-lucide="book-open"></i>
+          <span>Journal</span>
+        </button>
+
+        <button class="nav-link" data-nav="reminders">
+          <i data-lucide="bell"></i>
+          <span>Reminders</span>
+        </button>
+
+        <button class="nav-link" data-nav="profile">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer (User Info, Theme Toggle, Sign Out) -->
+      <div class="sidebar-footer">
+
+        <div class="user-profile-pill">
+          <div class="user-avatar-circle" id="sidebarAvatar">US</div>
+          <div class="user-info-text">
+            <div class="user-info-name" id="sidebarUserName">Loading...</div>
+            <div class="user-info-email" id="sidebarUserEmail">user@example.com</div>
+          </div>
+        </div>
+
+        <div class="sidebar-action-row">
+          <!-- Theme Toggle -->
+          <button id="themeToggleBtn" class="btn-sidebar-icon" title="Toggle Light/Dark Theme"
+            aria-label="Toggle Theme">
+            <i data-lucide="sun" id="themeIcon" style="width: 16px; height: 16px;"></i>
+          </button>
+
+          <!-- Logout Button -->
+          <button id="btnLogout" class="btn-sidebar-icon" title="Sign Out of Account" aria-label="Sign Out">
+            <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- ====================================================================
+         2. MAIN DASHBOARD CONTENT AREA
+         ==================================================================== -->
+    <main class="main-wrapper">
+
+      <!-- Top Navbar (Mobile menu toggle & current date) -->
+      <header class="top-navbar">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Navigation Menu">
+          <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+          <span>Menu</span>
+        </button>
+
+        <div class="date-pill" id="currentDateDisplay">
+          <i data-lucide="calendar" style="width: 14px; height: 14px; color: var(--primary-teal);"></i>
+          <span id="liveFormattedDate">Today, August 24</span>
+        </div>
+      </header>
+
+      <!-- Welcome Hero Section -->
+      <section class="welcome-hero-card">
+        <div class="welcome-left">
+          <h1 class="greeting-text" id="userGreetingTitle">
+            Good day, Friend 👋
+          </h1>
+          <p class="greeting-subtext">Here is your chronic condition adherence and resilience summary for today.</p>
+
+          <!-- Managed Conditions Tag Row -->
+          <div class="conditions-tag-row" id="userConditionsTagRow">
+            <!-- Dynamically populated from user.conditions -->
+          </div>
+        </div>
+
+        <!-- Quick Primary Action -->
+        <button id="btnHeroCheckin" class="welcome-cta-btn">
+          <i data-lucide="check-circle-2" style="width: 18px; height: 18px;"></i>
+          <span id="heroCheckinBtnText">Complete Today's Check-in</span>
+        </button>
+      </section>
+
+      <!-- ==================================================================
+           3. CORE STREAK & METRICS STAT GRID (4 Cards)
+           ================================================================== -->
+      <section class="metrics-stat-grid" aria-label="Streak and Adherence Metrics">
+
+        <!-- 1. Current Streak -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Current Streak</span>
+            <span class="stat-icon">🔥</span>
+          </div>
+          <div class="stat-value-large" id="statCurrentStreak">0 days</div>
+          <div class="stat-subtext" id="statStreakStatusSubtext">
+            <span class="status-badge initial" id="statStreakBadge">🌱 Not started</span>
+          </div>
+        </div>
+
+        <!-- 2. Best Streak -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Best Streak</span>
+            <span class="stat-icon">🏆</span>
+          </div>
+          <div class="stat-value-large" id="statBestStreak">0 days</div>
+          <div class="stat-subtext">
+            <span>Personal record consistency</span>
+          </div>
+        </div>
+
+        <!-- 3. Grace Days -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Grace Days</span>
+            <span class="stat-icon">🛡️</span>
+          </div>
+          <div class="stat-value-large" id="statGraceDays">0 / 2 used</div>
+          <div class="stat-subtext" id="statGraceSubtext">
+            <span>2 rest allowances available</span>
+          </div>
+        </div>
+
+        <!-- 4. Today's Adherence -->
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Today's Adherence</span>
+            <span class="stat-icon">📊</span>
+          </div>
+          <div class="stat-value-large" id="statTodayAdherence">0%</div>
+          <div class="stat-subtext" id="statAdherenceSubtext">
+            <span>0 of 0 habits completed</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           4. 2-COLUMN MAIN DASHBOARD BODY
+           ================================================================== -->
+      <div class="dashboard-columns-grid">
+
+        <!-- ================================================================
+             LEFT COLUMN: Today's Habits & Condition Health Biomarkers
+             ================================================================ -->
+        <div class="column-section">
+
+          <!-- Today's Habit Progress Card -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h2 class="dash-card-title">
+                <i data-lucide="check-square"></i>
+                <span>Today's Habit Progress</span>
+              </h2>
+              <span style="font-size: 0.76rem; color: var(--text-muted);" id="habitsStatusSummary">
+                Tap checkbox to log habit
+              </span>
+            </div>
+
+            <!-- Dynamic Habit Progress List -->
+            <div class="habits-progress-list" id="todayHabitsListContainer">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- Adaptive Condition-Specific Health Biomarkers -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h2 class="dash-card-title">
+                <i data-lucide="activity"></i>
+                <span>Condition Biomarkers & Vitals</span>
+              </h2>
+              <button class="btn-add-reading" id="btnOpenAddReadingModal">
+                + Add Reading
+              </button>
+            </div>
+
+            <!-- Dynamic Deduplicated Health Cards -->
+            <div class="health-biomarkers-grid" id="healthBiomarkersContainer">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- Personalized Behavioral Insight Banner -->
+          <div class="insight-card">
+            <div class="insight-icon-bubble">
+              <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
+            </div>
+            <div>
+              <div class="insight-text-heading" id="insightHeading">Adherence Pattern</div>
+              <p class="insight-text-body" id="insightBody">
+                Complete your first daily check-in to begin establishing your personal health baseline and resilience
+                trends.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             RIGHT COLUMN: Mood, 7-Day Mini Calendar, Achievements & Activity
+             ================================================================ -->
+        <div class="column-section">
+
+          <!-- Today's Mood & Wellness Card -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h2 class="dash-card-title">
+                <i data-lucide="smile"></i>
+                <span>Today's Wellness & Mood</span>
+              </h2>
+              <span style="font-size: 0.75rem; color: var(--primary-teal);" id="moodLoggedStatus">
+                Not logged yet
+              </span>
+            </div>
+
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;">
+              How are you feeling today physically & mentally?
+            </p>
+
+            <!-- Emoji Picker -->
+            <div class="mood-picker-row" id="moodPickerContainer">
+              <button class="mood-btn" data-mood="great" title="Feeling Great">
+                <span class="mood-emoji">😊</span>
+                <span class="mood-label">Great</span>
+              </button>
+              <button class="mood-btn" data-mood="good" title="Feeling Good">
+                <span class="mood-emoji">🙂</span>
+                <span class="mood-label">Good</span>
+              </button>
+              <button class="mood-btn" data-mood="neutral" title="Feeling Okay/Neutral">
+                <span class="mood-emoji">😐</span>
+                <span class="mood-label">Okay</span>
+              </button>
+              <button class="mood-btn" data-mood="low" title="Feeling Low/Fatigued">
+                <span class="mood-emoji">😟</span>
+                <span class="mood-label">Low</span>
+              </button>
+              <button class="mood-btn" data-mood="flareup" title="Experiencing Flare-up or Pain">
+                <span class="mood-emoji">😞</span>
+                <span class="mood-label">Pain</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 7-Day Mini Calendar Streak Preview -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h2 class="dash-card-title">
+                <i data-lucide="calendar"></i>
+                <span>Recent 7-Day Consistency</span>
+              </h2>
+              <a href="calendar.html" class="btn-add-reading" id="btnViewFullCalendar" style="text-decoration: none; display: inline-flex; align-items: center;">
+                View Calendar →
+              </a>
+            </div>
+
+            <div class="mini-calendar-row" id="miniCalendarPreviewRow">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- Achievements Preview -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h2 class="dash-card-title">
+                <i data-lucide="award"></i>
+                <span>Achievements Preview</span>
+              </h2>
+              <button class="btn-add-reading" id="btnViewAllAchievements">
+                All Badges →
+              </button>
+            </div>
+
+            <div class="achievements-preview-grid" id="achievementsPreviewContainer">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- Recent Activity Stream -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h2 class="dash-card-title">
+                <i data-lucide="clock"></i>
+                <span>Recent Activity</span>
+              </h2>
+            </div>
+
+            <div class="activity-feed-list" id="recentActivityFeedContainer">
+              <!-- Rendered dynamically by dashboard.js -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ====================================================================
+       INTERACTIVE MODALS
+       ==================================================================== -->
+
+  <!-- 1. Quick Daily Check-In Modal -->
+  <div class="modal-overlay" id="modalQuickCheckin">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Daily Health Check-in</h3>
+          <div id="modalCheckinDateLabel" style="font-size: 0.78rem; font-weight: 700; color: var(--primary-teal); margin-top: 2px;">Today</div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseCheckinModal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <form id="formCheckinModal" novalidate>
+        <div class="modal-scrollable-body">
+          <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 12px;">
+            How much of each habit did you complete today?
+          </p>
+
+          <!-- Dynamic Habit Percentage Level Selectors -->
+          <div id="modalHabitsChecklist" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+            <!-- Dynamically populated with [100%] [75%] [50%] [25%] [0%] options -->
+          </div>
+
+          <!-- Live Score & Classification Preview -->
+          <div class="modal-live-score-card" id="modalLiveScoreCard">
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Today's Adherence</div>
+              <strong id="modalLiveScoreText" style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--text-main);">0%</strong>
+            </div>
+            <span id="modalLiveStatusBadge" class="status-badge initial" style="font-size: 0.72rem; padding: 4px 10px;">Not logged</span>
+          </div>
+
+          <!-- Symptoms / Notes -->
+          <div class="modal-form-group" style="margin-bottom: 4px;">
+            <label class="modal-label">Symptoms or Notes (Optional)</label>
+            <input type="text" id="modalCheckinNotes" class="modal-input" placeholder="e.g., Felt tired today and had mild headache.">
+          </div>
+        </div>
+
+        <!-- Pinned Actions Footer (Always Visible) -->
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-sidebar-icon" id="btnCancelCheckin" style="flex: none; padding: 8px 18px;">Cancel</button>
+          <button type="submit" class="welcome-cta-btn" style="padding: 9px 22px;">
+            <span>Save Today's Check-in</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Add Health Reading Modal -->
+  <div class="modal-overlay" id="modalAddReading">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Health Metric</h3>
+        <button class="modal-close-btn" id="btnCloseReadingModal">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <form id="formAddReadingModal" novalidate>
+        <div class="modal-form-group">
+          <label class="modal-label">Metric Type</label>
+          <select id="modalBiomarkerType" class="modal-select">
+            <!-- Dynamically populated based on conditions -->
+          </select>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="modal-label">Measurement Value</label>
+          <input type="number" step="any" id="modalBiomarkerValue" class="modal-input" placeholder="e.g. 108" required>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="modal-label">Unit</label>
+          <input type="text" id="modalBiomarkerUnit" class="modal-input" readonly>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+          <button type="button" class="btn-sidebar-icon" id="btnCancelReading"
+            style="flex: none; padding: 8px 16px;">Cancel</button>
+          <button type="submit" class="welcome-cta-btn" style="padding: 9px 20px;">
+            <span>Save Reading</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Feature Coming Soon / Navigation Modal -->
+  <div class="modal-overlay" id="modalFeaturePreview">
+    <div class="modal-card" style="text-align: center;">
+      <div style="font-size: 2.5rem; margin-bottom: 8px;" id="previewFeatureIcon">🗓️</div>
+      <h3 class="modal-title" style="margin-bottom: 6px;" id="previewFeatureTitle">Calendar & Heatmap</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;" id="previewFeatureDesc">
+        The full version of this feature will be built in the next step. Your real check-in data from today is already
+        being calculated!
+      </p>
+      <button class="welcome-cta-btn" id="btnCloseFeaturePreview" style="margin: 0 auto;">
+        <span>Got it!</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Global Toast Notifications Container -->
+  <div class="toast-container" id="dashToastContainer"></div>
+
+  <!-- Application Feature Modules (Loaded in strict dependency order) -->
+  <script src="js/conditions.js?v=2"></script>
+  <script src="js/common/storage.js?v=2"></script>
+  <script src="js/common/utils.js?v=2"></script>
+  <script src="js/common/auth-guard.js?v=2"></script>
+  <script src="js/checkin/checkin.js?v=2"></script>
+  <script src="js/streak/streak.js?v=2"></script>
+  <script src="js/health/health.js?v=2"></script>
+  <script src="js/wellness/wellness.js?v=2"></script>
+  <script src="js/dashboard/dashboard.js?v=2"></script>
+</body>
+
+</html>
