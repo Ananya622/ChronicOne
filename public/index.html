@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChronicOne— Chronic Condition Habit & Streak Tracker</title>
+  <meta name="description" content="Personalized chronic-condition habit tracking with intelligent grace days and relapse-aware recovery mechanics.">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Dedicated Stylesheet -->
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+
+  <!-- Ambient Subtle Glowing Background -->
+  <div class="ambient-glow-mesh"></div>
+
+  <!-- Main Layout Wrapper -->
+  <main class="auth-wrapper">
+
+    <!-- Brand Header & Theme Switcher -->
+    <header class="auth-brand-header">
+      <div class="brand-left-group">
+        <i data-lucide="shield-check" class="brand-icon-shield"></i>
+        <h1 class="brand-name">ChronicOne</h1>
+        <span class="brand-tag">Resilience OS</span>
+      </div>
+      <button id="themeToggle" class="theme-toggle-btn" type="button" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+        <i data-lucide="sun" id="themeIcon" style="width: 17px; height: 17px;"></i>
+      </button>
+    </header>
+
+    <!-- Main Auth Card -->
+    <section class="auth-card">
+
+      <!-- Mode Switcher Tabs: Sign Up vs Log In (Sign In is default on launch) -->
+      <nav class="auth-mode-tabs" aria-label="Authentication Mode">
+        <button id="tabRegister" class="auth-tab-btn" type="button">
+          Create Account
+        </button>
+        <button id="tabLogin" class="auth-tab-btn active" type="button">
+          Sign In
+        </button>
+      </nav>
+
+      <!-- ====================================================================
+           REGISTER FLOW (Multi-Step Onboarding) - Hidden on default launch
+           ==================================================================== -->
+      <div id="registerFlowContainer" style="display: none;">
+
+        <!-- Progress Header -->
+        <div class="step-progress-wrapper">
+          <div class="step-progress-text">
+            <span class="step-count-label" id="stepCountLabel">Step 1 of 3</span>
+            <span class="step-name-label" id="stepNameLabel">Account Information</span>
+          </div>
+          <div class="step-progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">
+            <div class="progress-segment active" id="progSegment1"></div>
+            <div class="progress-segment" id="progSegment2"></div>
+            <div class="progress-segment" id="progSegment3"></div>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             STEP 1: Account Information & Dynamic Missing Password Checker
+             ================================================================== -->
+        <form id="step1Form" class="step-view active" novalidate>
+          <h2 class="step-heading">Create your health account</h2>
+          <p class="step-subtext">Enter your details to begin your personalized habit journey.</p>
+
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="regFullName" class="form-label">Full Name</label>
+            <div class="input-wrapper">
+              <input type="text" id="regFullName" class="form-input" placeholder="e.g. Alex Morgan" required autocomplete="name">
+            </div>
+            <span class="field-error-msg" id="nameError">Full name required.</span>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="regEmail" class="form-label">Email Address</label>
+            <div class="input-wrapper">
+              <input type="email" id="regEmail" class="form-input" placeholder="alex@example.com" required autocomplete="email">
+            </div>
+            <span class="field-error-msg" id="emailError">Invalid email format.</span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="regPassword" class="form-label">Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="regPassword" class="form-input" placeholder="Create strong password" required autocomplete="new-password">
+              <button type="button" class="password-toggle-btn" id="toggleRegPassword" title="Show/Hide Password" aria-label="Toggle password visibility">
+                <i data-lucide="eye" style="width: 15px; height: 15px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="regConfirmPassword" class="form-label">Confirm Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="regConfirmPassword" class="form-input" placeholder="Re-enter password" required autocomplete="new-password">
+              <button type="button" class="password-toggle-btn" id="toggleConfirmPassword" title="Show/Hide Password" aria-label="Toggle confirm password visibility">
+                <i data-lucide="eye" style="width: 15px; height: 15px;"></i>
+              </button>
+            </div>
+            <span class="field-error-msg" id="confirmPasswordError">Passwords do not match.</span>
+          </div>
+
+          <!-- Dynamic Password Strength UI (Only shows unmet requirements dynamically) -->
+          <div class="password-meter-container" id="passwordMeterContainer">
+            <div class="password-meter-header">
+              <span class="strength-label-text">Security Strength:</span>
+              <span class="strength-badge" id="strengthBadge">Enter password</span>
+            </div>
+            <div class="password-meter-bar">
+              <div class="meter-segment" id="meterSeg1"></div>
+              <div class="meter-segment" id="meterSeg2"></div>
+              <div class="meter-segment" id="meterSeg3"></div>
+              <div class="meter-segment" id="meterSeg4"></div>
+            </div>
+
+            <!-- Dynamic Missing Rules Tags (Populated by JS when unfulfilled) -->
+            <div class="unmet-rules-container" id="unmetRulesContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Step 1 Actions -->
+          <div class="step-actions-row">
+            <button type="submit" class="btn-primary" id="btnToStep2">
+              <span>Continue to Health Focus</span>
+              <i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- ==================================================================
+             STEP 2: Health Conditions (PART 4)
+             ================================================================== -->
+        <div id="step2View" class="step-view">
+          <h2 class="step-heading">Let's personalize your experience</h2>
+          <p class="step-subtext">What condition(s) are you managing? (Select all that apply)</p>
+
+          <div class="conditions-selection-grid" id="conditionsGrid">
+            
+            <!-- Diabetes -->
+            <div class="condition-card" data-condition="diabetes" tabindex="0" role="checkbox" aria-checked="false">
+              <div class="condition-card-content">
+                <strong>🩸 Diabetes</strong>
+                <p>Blood glucose & metabolic pacing</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+            <!-- Hypertension -->
+            <div class="condition-card" data-condition="hypertension" tabindex="0" role="checkbox" aria-checked="false">
+              <div class="condition-card-content">
+                <strong>🫀 Hypertension</strong>
+                <p>Cardiovascular blood pressure</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+            <!-- Asthma -->
+            <div class="condition-card" data-condition="asthma" tabindex="0" role="checkbox" aria-checked="false">
+              <div class="condition-card-content">
+                <strong>🫁 Asthma</strong>
+                <p>Airway management & peak flow</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+            <!-- Thyroid -->
+            <div class="condition-card" data-condition="thyroid" tabindex="0" role="checkbox" aria-checked="false">
+              <div class="condition-card-content">
+                <strong>🦋 Thyroid condition</strong>
+                <p>Hormonal energy & metabolism</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+            <!-- Arthritis -->
+            <div class="condition-card" data-condition="arthritis" tabindex="0" role="checkbox" aria-checked="false">
+              <div class="condition-card-content">
+                <strong>🦴 Arthritis</strong>
+                <p>Joint mobility & inflammation</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+            <!-- Other -->
+            <div class="condition-card" data-condition="other" tabindex="0" role="checkbox" aria-checked="false">
+              <div class="condition-card-content">
+                <strong>✨ Other Condition</strong>
+                <p>Specify a custom chronic focus</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+            <!-- Prefer not to say -->
+            <div class="condition-card" data-condition="prefer_not_to_say" tabindex="0" role="checkbox" aria-checked="false" style="grid-column: 1 / -1;">
+              <div class="condition-card-content">
+                <strong>🔒 Prefer not to say</strong>
+                <p>Track general wellness habits without specific illness profiling</p>
+              </div>
+              <div class="card-checkbox">✓</div>
+            </div>
+
+          </div>
+
+          <!-- Custom Condition Input (Revealed if 'Other' is checked) -->
+          <div class="form-group custom-condition-wrapper" id="customConditionWrapper">
+            <input type="text" id="customConditionInput" class="form-input" placeholder="Type custom condition name (e.g. Migraine, Long COVID)">
+          </div>
+
+          <!-- Step 2 Actions -->
+          <div class="step-actions-row">
+            <button type="button" class="btn-secondary" id="btnBackToStep1">
+              ← Back
+            </button>
+            <button type="button" class="btn-primary" id="btnToStep3">
+              <span>Continue to Habits</span>
+              <i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             STEP 3: Habit Personalization (PART 5)
+             ================================================================== -->
+        <div id="step3View" class="step-view">
+          <h2 class="step-heading">What would you like to track?</h2>
+          <p class="step-subtext">
+            Sensible habits are recommended for you. Tap any habit to toggle.
+          </p>
+
+          <!-- Habit Cards Selection Grid (Populated dynamically) -->
+          <div class="habits-selection-grid" id="habitsGrid">
+            <!-- Rendered by onboarding.js -->
+          </div>
+
+          <!-- Step 3 Actions -->
+          <div class="step-actions-row">
+            <button type="button" class="btn-secondary" id="btnBackToStep2">
+              ← Back
+            </button>
+            <button type="button" class="btn-primary" id="btnCompleteRegistration">
+              <span>Complete & Launch Hub</span>
+              <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+           LOGIN FLOW (For Returning Users) - Active by default on launch
+           ==================================================================== -->
+      <form id="loginForm" class="step-view active" novalidate>
+        <div class="signin-welcome-banner">
+          <div class="signin-avatar-icon">
+            <i data-lucide="user-check" style="width: 22px; height: 22px;"></i>
+          </div>
+          <h2 class="step-heading" style="text-align: center;">Welcome Back</h2>
+          <p class="step-subtext" style="text-align: center;">Sign in to continue your habit streaks and recovery logs.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="loginEmail" class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="loginEmail" class="form-input" placeholder="alex@example.com" required autocomplete="email">
+          </div>
+          <span class="field-error-msg" id="loginEmailError">Please enter your registered email.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword" class="form-label">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" id="toggleLoginPassword" title="Show/Hide Password" aria-label="Toggle password visibility">
+              <i data-lucide="eye" style="width: 15px; height: 15px;"></i>
+            </button>
+          </div>
+          <span class="field-error-msg" id="loginPasswordError">Incorrect password.</span>
+        </div>
+
+        <div class="step-actions-row" style="margin-top: 14px;">
+          <button type="submit" class="btn-primary" id="btnLoginSubmit" style="width: 100%; justify-content: center;">
+            <span>Sign In to Dashboard</span>
+            <i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i>
+          </button>
+        </div>
+
+        <div class="signin-helper-pill">
+          Don't have an account yet? <a id="linkSwitchToRegister">Create one now</a>
+        </div>
+      </form>
+
+    </section>
+
+  </main>
+
+  <!-- Global Toast Notifications -->
+  <div class="auth-toast-container" id="authToastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="js/conditions.js"></script>
+  <script src="js/onboarding.js"></script>
+</body>
+</html>
