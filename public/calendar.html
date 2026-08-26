@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar Heatmap — ChronicOne</title>
+  <meta name="description"
+    content="Monthly adherence heatmap tracking your chronic condition habit consistency.">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/calendar.css">
+</head>
+
+<body>
+
+  <!-- Ambient Glow Background -->
+  <div class="ambient-glow-mesh"></div>
+
+  <!-- Main App Layout (Identical to Dashboard) -->
+  <div class="app-container">
+
+    <!-- ====================================================================
+         1. SIDEBAR NAVIGATION (Matches Dashboard Structure & Behavior)
+         ==================================================================== -->
+    <aside class="sidebar" id="appSidebar">
+
+      <!-- Brand Header -->
+      <div class="sidebar-header" onclick="window.location.href='dashboard.html'" style="cursor: pointer;">
+        <i data-lucide="shield-check" class="brand-icon"></i>
+        <span class="brand-title">ChronicOne</span>
+      </div>
+
+      <!-- Navigation Links -->
+        <a href="dashboard.html" class="nav-link">
+          <i data-lucide="home"></i>
+          <span>Home</span>
+        </a>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="calendar-check"></i>
+          <span>Daily Check-in</span>
+        </button>
+
+        <a href="calendar.html" class="nav-link active">
+          <i data-lucide="calendar"></i>
+          <span>Calendar</span>
+        </a>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="trending-up"></i>
+          <span>Progress</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="activity"></i>
+          <span>Health</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="smile"></i>
+          <span>Wellness</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="refresh-cw"></i>
+          <span>Recovery</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="award"></i>
+          <span>Achievements</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="book-open"></i>
+          <span>Journal</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="bell"></i>
+          <span>Reminders</span>
+        </button>
+
+        <button class="nav-link" onclick="window.location.href='dashboard.html'">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer (User Info, Theme Toggle, Sign Out) -->
+      <div class="sidebar-footer">
+        <div class="user-profile-pill">
+          <div class="user-avatar-circle" id="sidebarAvatar">US</div>
+          <div class="user-info-text">
+            <div class="user-info-name" id="sidebarUserName">Loading...</div>
+            <div class="user-info-email" id="sidebarUserEmail">user@example.com</div>
+          </div>
+        </div>
+
+        <div class="sidebar-action-row">
+          <!-- Theme Toggle -->
+          <button id="themeToggleBtn" class="btn-sidebar-icon" title="Toggle Light/Dark Theme"
+            aria-label="Toggle Theme">
+            <i data-lucide="sun" id="themeIcon" style="width: 16px; height: 16px;"></i>
+          </button>
+
+          <!-- Logout Button -->
+          <button id="btnLogout" class="btn-sidebar-icon" title="Sign Out of Account" aria-label="Sign Out">
+            <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ====================================================================
+         2. MAIN CONTENT AREA (Uses .main-wrapper to sit beside fixed sidebar)
+         ==================================================================== -->
+    <main class="main-wrapper">
+
+      <!-- Top Navbar (Mobile menu toggle) -->
+      <header class="top-navbar">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Navigation Menu">
+          <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+          <span>Menu</span>
+        </button>
+      </header>
+
+      <!-- Calendar Content Container -->
+      <div class="calendar-content-container">
+
+        <!-- 1. Header Card & Month Navigation Controls -->
+        <div class="calendar-header-card">
+          <div class="calendar-title-group">
+            <h1>
+              <i data-lucide="calendar" style="color: var(--primary-teal); width: 26px; height: 26px;"></i>
+              <span>Calendar</span>
+            </h1>
+            <p class="calendar-subtitle">Track your daily health routine and see your consistency over time.</p>
+          </div>
+
+          <!-- Month Navigation Controls -->
+          <div class="month-nav-controls">
+            <button class="btn-nav-month" id="btnPrevMonth" title="Previous Month" aria-label="Previous Month">
+              <i data-lucide="chevron-left"></i>
+              <span>Previous</span>
+            </button>
+
+            <div class="month-display-pill" id="currentMonthYearDisplay">
+              Loading Month...
+            </div>
+
+            <button class="btn-nav-month" id="btnNextMonth" title="Next Month" aria-label="Next Month">
+              <span>Next</span>
+              <i data-lucide="chevron-right"></i>
+            </button>
+
+            <button class="btn-nav-month btn-today" id="btnTodayMonth" title="Jump to Current Month">
+              <span>Today</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Heatmap Grid Card -->
+        <div class="calendar-grid-card">
+          <div class="calendar-grid-wrapper">
+
+            <!-- Weekday Header Row (Mon - Sun) -->
+            <div class="weekday-header-row" id="weekdayHeaderRow">
+              <!-- Rendered dynamically by calendar.js -->
+            </div>
+
+            <!-- Monthly Days Grid (7 Equal Columns) -->
+            <div class="calendar-days-grid" id="calendarDaysGrid">
+              <!-- Rendered dynamically by calendar.js -->
+            </div>
+          </div>
+
+          <!-- Heatmap Visual Legend -->
+          <div class="heatmap-legend-row" aria-label="Heatmap Legend">
+            <div class="legend-item">
+              <span class="legend-swatch full"></span>
+              <span>Full (100%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch partial"></span>
+              <span>Partial (50-99%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch low"></span>
+              <span>Low (1-49%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch missed"></span>
+              <span>Missed (0%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch no-checkin"></span>
+              <span>No check-in</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Monthly Consistency Summary Card -->
+        <div class="monthly-summary-card">
+          <div class="summary-header">
+            <h2 class="summary-title">
+              <i data-lucide="bar-chart-3" style="color: var(--primary-teal); width: 18px; height: 18px;"></i>
+              <span>Monthly Summary</span>
+            </h2>
+          </div>
+
+          <!-- 5-Metric Breakdown Grid -->
+          <div class="summary-stats-grid">
+            <div class="summary-stat-pill">
+              <span class="summary-stat-label">Total Logs</span>
+              <span class="summary-stat-value" id="summaryTotalCheckins">0</span>
+            </div>
+
+            <div class="summary-stat-pill">
+              <span class="summary-stat-label" style="color: #10B981;">Full Days</span>
+              <span class="summary-stat-value" id="summaryFullDays" style="color: #10B981;">0</span>
+            </div>
+
+            <div class="summary-stat-pill">
+              <span class="summary-stat-label" style="color: #0D9488;">Partial Days</span>
+              <span class="summary-stat-value" id="summaryPartialDays" style="color: #0D9488;">0</span>
+            </div>
+
+            <div class="summary-stat-pill">
+              <span class="summary-stat-label" style="color: #F59E0B;">Low Days</span>
+              <span class="summary-stat-value" id="summaryLowDays" style="color: #F59E0B;">0</span>
+            </div>
+
+            <div class="summary-stat-pill">
+              <span class="summary-stat-label" style="color: #F43F5E;">Missed Days</span>
+              <span class="summary-stat-value" id="summaryMissedDays" style="color: #F43F5E;">0</span>
+            </div>
+          </div>
+
+          <!-- Supportive Insight Feedback Message -->
+          <div class="summary-supportive-message" id="summarySupportiveMsg">
+            <span>🌱</span>
+            <span>Loading monthly adherence insights...</span>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Day Details Modal (Opens on Day Cell Click) -->
+  <div class="modal-overlay" id="modalDayDetails" role="dialog" aria-modal="true" aria-labelledby="dayDetailsDateTitle">
+    <div class="modal-card modal-card-day-details">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-wrap" style="display: flex; align-items: center; gap: 10px;">
+          <div class="user-avatar-circle" style="width: 32px; height: 32px; font-size: 0.8rem; background: var(--primary-teal);">
+            <i data-lucide="calendar" style="width: 16px; height: 16px; color: #FFFFFF;"></i>
+          </div>
+          <div>
+            <h2 class="modal-title" id="dayDetailsDateTitle" style="font-size: 1.15rem; margin-bottom: 0;">Date Details</h2>
+            <p class="modal-subtitle" id="dayDetailsSubtitle" style="font-size: 0.76rem; color: var(--text-muted);">Daily Adherence & Habit Record</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseDayDetails" aria-label="Close Modal">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-scrollable-body" id="dayDetailsContent">
+        <!-- Rendered dynamically by calendar.js on date click -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Floating Tooltip Container -->
+  <div class="calendar-tooltip" id="calFloatingTooltip" role="tooltip"></div>
+
+  <!-- Application Scripts (Strict Dependency Order) -->
+  <script src="js/conditions.js?v=2"></script>
+  <script src="js/common/storage.js?v=2"></script>
+  <script src="js/common/utils.js?v=2"></script>
+  <script src="js/common/auth-guard.js?v=2"></script>
+  <script src="js/checkin/checkin.js?v=2"></script>
+  <script src="js/calendar/calendar.js?v=2"></script>
+</body>
+
+</html>
