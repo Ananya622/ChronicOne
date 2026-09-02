@@ -1,5 +1,5 @@
 /**
- * AuraCare — Express Backend Server
+ * ChronicOne — Express Backend Server
  * Simple, readable, and human-friendly backend for chronic habit tracking.
  */
 
@@ -146,5 +146,5 @@ function calculateStreak(history) {
 
 // Start the Server
 app.listen(PORT, () => {
-  console.log(`✅ AuraCare server running at: http://localhost:${PORT}`);
+  console.log(`✅ ChronicOne server running at: http://localhost:${PORT}`);
 });
