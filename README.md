@@ -4,7 +4,7 @@
 
 ChronicOne is a web application designed to help people manage their daily health routines and stay consistent with the habits that matter to them.
 
-Instead of keeping health-related information scattered across notes or different apps, ChronicOne brings daily check-ins, habit adherence, health measurements, mood, progress, and recovery into one place.
+Instead of keeping health-related information scattered across notes or different applications, ChronicOne brings **daily check-ins, habit adherence, health measurements, mood, progress, and recovery** into one place.
 
 The application adapts the tracking experience according to the user's selected health conditions.
 
@@ -12,9 +12,9 @@ The application adapts the tracking experience according to the user's selected 
 
 ## 🌱 Why ChronicOne?
 
-Managing a chronic condition is not only about recording health measurements. Long-term consistency also matters.
+Managing a chronic condition is not only about recording health measurements. **Long-term consistency matters too.**
 
-ChronicOne focuses on questions like:
+ChronicOne focuses on questions such as:
 
 - How consistent have I been recently?
 - Did I complete today's important habits?
@@ -32,16 +32,16 @@ The goal is to make health tracking feel **simple, visual, and encouraging** rat
 
 ### 📋 Daily Check-in
 
-Users can complete their daily health-related habits and get an automatic adherence score.
+Users can complete their daily health-related habits and receive an automatic adherence score.
 
-The day is classified as:
+Each day is classified as:
 
-- 🟢 Full
-- 🔵 Partial
-- 🟠 Low
-- 🔴 Missed
+- 🟢 **Full**
+- 🔵 **Partial**
+- 🟠 **Low**
+- 🔴 **Missed**
 
-The dashboard then gives a quick overview of the day's progress.
+The dashboard provides a quick overview of the user's daily progress.
 
 ---
 
@@ -84,7 +84,7 @@ The Health section allows users to record condition-related measurements such as
 - Joint Pain
 - Sleep Duration
 
-Health records are stored with their dates so historical readings can be viewed separately.
+Health records are stored with their dates so historical readings can be reviewed separately.
 
 The biomarkers shown can also change according to the user's selected health conditions.
 
@@ -94,7 +94,7 @@ The biomarkers shown can also change according to the user's selected health con
 
 Users can record how they are feeling physically and mentally.
 
-This allows wellness and mood information to be viewed alongside daily adherence.
+This allows wellness and mood information to be viewed alongside daily adherence and health progress.
 
 ---
 
@@ -110,7 +110,7 @@ Users can:
 - Navigate between months
 - See the last 7 days of consistency
 - Hover over a day for a quick summary
-- Click a day to see detailed information
+- Click a day to view detailed information
 
 The Day Details view can show:
 
@@ -160,130 +160,3 @@ Health  Mood  Progress
    Streak System
        ↓
  Calendar & History
-
-## 🚀 How ChronicOne Works — Mini Demo
-
-Here is a quick walkthrough of how ChronicOne works from a user's perspective.
-
-### 1. 🔐 Login & Sign Up
-
-Users can either **log in to an existing account** or **create a new account**.
-
-We have also provided **two themes** to give users a more comfortable and personalized experience.
-
-<img width="1527" height="707" alt="ChronicOne Login Page" src="https://github.com/user-attachments/assets/d5ef1955-520f-49bd-a128-279f63a01ab7" />
-
-<img width="1528" height="715" alt="ChronicOne Sign Up Page" src="https://github.com/user-attachments/assets/59ec4923-1754-4fda-a77a-8fc3be726452" />
-
----
-
-### 2. 🩺 Personalized Onboarding
-
-For new users, ChronicOne begins with a short onboarding process.
-
-First, users select the **health conditions they want to manage**.
-
-<img width="1005" height="641" alt="Health Conditions Selection" src="https://github.com/user-attachments/assets/ce18c6fa-a012-45ee-9c5e-245cadc0448f" />
-
-Next, users choose the **health metrics and habits they want to track**.
-
-Based on the selected conditions, ChronicOne provides **recommended measurements and habits**, while still allowing users to customize them according to their needs.
-
-Once the setup is completed, the user is taken to their personalized dashboard.
-
-<img width="1130" height="637" alt="Personalized Onboarding" src="https://github.com/user-attachments/assets/0065007c-d35c-44ea-8bbc-82d5b9b849ed" />
-
----
-
-### 3. 📊 Personalized Dashboard
-
-The dashboard acts as the user's **central health-tracking space**.
-
-Users can monitor and manage information such as:
-
-- 🧠 Daily mood
-- ❤️ Blood pressure
-- ⚖️ Weight
-- ✅ Daily habits
-- 📈 Health measurements
-- 🔥 Current streak
-- 🎯 Personal progress
-
-<img width="1525" height="708" alt="ChronicOne Dashboard" src="https://github.com/user-attachments/assets/d1aba6f0-2dd9-44a6-991a-bbcd8c65a3e0" />
-
-<img width="972" height="697" alt="Health Tracking" src="https://github.com/user-attachments/assets/fa26f3c9-2a33-4bb2-a74f-9c7290abc1c9" />
-
-### 🎯 Condition-Based Tracking
-
-The dashboard is **personalized according to the conditions selected during onboarding**.
-
-For example, if a user's selected condition requires monitoring blood pressure, the relevant blood-pressure tracking option is automatically included in their dashboard.
-
-This ensures that users see the measurements that are most relevant to their individual tracking needs.
-
-<img width="1517" height="730" alt="Condition Based Tracking" src="https://github.com/user-attachments/assets/ad42d8ae-9114-419b-8333-01c35708035f" />
-
----
-
-### 4. 🔥 Streaks & Progress Tracking
-
-ChronicOne maintains the user's **daily streak** to encourage consistency and help users build long-term habits.
-
-The application also provides a **GitHub-style activity calendar**, allowing users to visually track their daily progress.
-
-Users can see:
-
-- Daily completion percentage
-- Check-in history
-- Notes recorded for each day
-- Health measurements recorded on a particular day
-- Current and previous streaks
-
-The streak mechanism is designed to encourage users to stay consistent with their health routines.
-
-<img width="1526" height="722" alt="Progress Calendar" src="https://github.com/user-attachments/assets/b7c4e8e5-4814-4f19-a966-7d7ce3c3a0be" />
-
----
-
-### 5. 📅 Detailed Daily Records
-
-Users can **double-click a day on the calendar** to view the detailed information recorded for that particular day.
-
-This provides a quick way to review previous measurements, notes, and daily progress.
-
-<img width="1461" height="713" alt="Daily Details" src="https://github.com/user-attachments/assets/200443ac-0a18-4804-8a11-7b4a89baaaaf" />
-
----
-
-### 6. 🏆 Achievements
-
-To make the experience more engaging, ChronicOne also includes an **Achievements section**.
-
-Users can unlock achievements based on their progress and consistency, adding a small element of motivation and gamification to the tracking experience.
-
-We plan to continue expanding ChronicOne with additional features that make health tracking more **engaging, personalized, and easier to maintain over time**.
-
----
-
-## 🔄 Complete User Flow
-
-```text
-Login / Sign Up
-       ↓
-Personalized Onboarding
-       ↓
-Select Health Conditions
-       ↓
-Select Metrics & Habits
-       ↓
-Personalized Dashboard
-       ↓
-Daily Check-ins
-       ↓
-Health & Wellness Tracking
-       ↓
-Streak & Progress Tracking
-       ↓
-Calendar History
-       ↓
-Achievements
