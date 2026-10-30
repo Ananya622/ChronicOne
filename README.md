@@ -108,9 +108,6 @@ Personalized dashboard
 ---
 ## Application Screenshots
 
-The screenshots below are retained from the previous README to preserve the original project walkthrough.
-
-> **Image-link note:** The original screenshots use temporary signed GitHub attachment URLs. If an image does not load on GitHub, upload that same existing image into a repository `screenshots/` folder and replace only its URL with a relative path. You do not need to retake the screenshots.
 
 ### ChronicOne Login Page
 
@@ -317,18 +314,6 @@ ChronicOne/
 ├── package.json
 └── package-lock.json
 ```
-
-------------------------------------------------------------------------
-
-## Screenshots
-
-Add current application screenshots to the repository and link them here
-using repository-relative paths. This keeps the README images stable
-instead of relying on temporary signed image URLs.
-
-Suggested screenshots: - Login and registration - Condition selection
-and onboarding - Personalized dashboard - Health tracking - Calendar and
-daily details
 
 ------------------------------------------------------------------------
 
