@@ -6,8 +6,7 @@
 
 const CheckIn = require('../models/CheckIn');
 const { calculateDailyScore, classifyDay, calculateStreak } = require('../utils/streakEngine');
-
-const getTodayDateString = () => new Date().toISOString().slice(0, 10);
+const { getTodayDateString, isValidCalendarDate, isFutureDate } = require('../utils/dateUtils');
 
 /**
  * @desc    Create or update a check-in record for a date (idempotent same-day editing)
@@ -19,12 +18,11 @@ const createOrUpdateCheckIn = async (req, res) => {
     const { date, habits, notes } = req.body;
     const checkInDate = date || getTodayDateString();
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(checkInDate)) {
+    if (!isValidCalendarDate(checkInDate)) {
       return res.status(400).json({ error: 'Date must be formatted as YYYY-MM-DD.' });
     }
 
-    const today = getTodayDateString();
-    if (checkInDate > today) {
+    if (isFutureDate(checkInDate)) {
       return res.status(400).json({ error: 'Cannot log check-in for a future date.' });
     }
 
@@ -149,5 +147,8 @@ module.exports = {
   createOrUpdateCheckIn,
   getUserCheckIns,
   getTodayCheckIn,
-  getStreakStats
+  getStreakStats,
+  getTodayDateString,
+  isValidCalendarDate,
+  isFutureDate
 };

@@ -78,7 +78,7 @@ function openCheckInModal(targetHabitId = null) {
   const dateLabel = document.getElementById('modalCheckinDateLabel');
   if (dateLabel) {
     const now = new Date();
-    dateLabel.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    dateLabel.textContent = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   }
 
   const existingHabitValues = todayCheckIn ? (todayCheckIn.habits || {}) : {};

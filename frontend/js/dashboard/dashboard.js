@@ -146,7 +146,7 @@ function renderUserProfileAndGreeting() {
   // Formatted date pill
   const liveDateElem = document.getElementById('liveFormattedDate');
   if (liveDateElem) {
-    const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+    const options = { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
     liveDateElem.textContent = now.toLocaleDateString('en-US', options);
   }
 
@@ -420,17 +420,17 @@ function renderMiniCalendar() {
   const userHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser ? currentUser.habits : []);
   const rawHistory = typeof getUserCheckIns === 'function' ? getUserCheckIns(currentUser) : [];
   const todayDateStr = typeof getTodayDate === 'function' ? getTodayDate() : new Date().toISOString().slice(0, 10);
-  const today = new Date();
+  const [ty, tm, td] = todayDateStr.split('-').map(Number);
+  const baseUtc = new Date(Date.UTC(ty, tm - 1, td));
 
-  // Generate exact past 7 calendar days ending today [today-6 ... today]
+  // Generate exact past 7 calendar days ending today in UTC [today-6 ... today]
   for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
-    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const dayName = d.toLocaleDateString('en-US', { weekday: 'narrow' });
-    const dayNum = d.getDate();
+    const d = new Date(baseUtc.getTime() - i * 86400000);
+    const dateStr = d.toISOString().slice(0, 10);
+    const dayName = d.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'narrow' });
+    const dayNum = d.getUTCDate();
     const isToday = (dateStr === todayDateStr);
-    const readableDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const readableDate = d.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' });
 
     // Look up check-in record for this calendar date
     const rawCheckIn = rawHistory.find(c => c.date === dateStr);

@@ -27,15 +27,14 @@ function classifyDay(score) {
   return 'MISSED';
 }
 
-// Helper to parse YYYY-MM-DD into UTC midnight timestamp
+const { getTodayDateString, parseCalendarDate } = require('./dateUtils');
+
+// Helper to parse YYYY-MM-DD into UTC midnight timestamp for calendar interval math
 function parseUtcDate(dateStr) {
-  if (!dateStr || typeof dateStr !== 'string') return 0;
-  const parts = dateStr.slice(0, 10).split('-');
-  if (parts.length !== 3) return 0;
-  return Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  return parseCalendarDate(dateStr);
 }
 
-function calculateStreak(checkIns, todayDate = new Date().toISOString().slice(0, 10)) {
+function calculateStreak(checkIns, todayDate = getTodayDateString()) {
   const maxGraceDays = 2;
   const recoveryGoal = 3;
 

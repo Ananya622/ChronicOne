@@ -6,58 +6,12 @@
 
 const MoodRecord = require('../models/MoodRecord');
 
-/**
- * Validates that a string is in exact YYYY-MM-DD format and represents an actual calendar date.
- * Rejects impossible dates (e.g., 2026-02-31, 2026-13-10, 2026-04-31).
- */
-const isValidCalendarDate = (dateString) => {
-  if (typeof dateString !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    return false;
-  }
-  const [yearStr, monthStr, dayStr] = dateString.split('-');
-  const year = Number(yearStr);
-  const month = Number(monthStr);
-  const day = Number(dayStr);
-
-  if (month < 1 || month > 12 || day < 1 || day > 31) {
-    return false;
-  }
-
-  // Construct UTC date and verify that year, month, and day match without rollover
-  const dateObj = new Date(Date.UTC(year, month - 1, day));
-  return (
-    dateObj.getUTCFullYear() === year &&
-    dateObj.getUTCMonth() === month - 1 &&
-    dateObj.getUTCDate() === day
-  );
-};
-
-// Explicit application timezone (UTC standard across ChronicOne backend)
-const APP_TIMEZONE = process.env.APP_TIMEZONE || 'UTC';
-
-/**
- * Returns today's date formatted as YYYY-MM-DD in the authoritative application timezone.
- */
-const getTodayDateString = (now = new Date()) => {
-  if (APP_TIMEZONE === 'UTC') {
-    return now.toISOString().slice(0, 10);
-  }
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: APP_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(now);
-};
-
-/**
- * Checks whether a YYYY-MM-DD string is in the future.
- * Uses the exact same authoritative application timezone as getTodayDateString().
- */
-const isFutureDate = (dateString, now = new Date()) => {
-  const today = getTodayDateString(now);
-  return dateString > today;
-};
+const {
+  APP_TIMEZONE,
+  getTodayDateString,
+  isValidCalendarDate,
+  isFutureDate
+} = require('../utils/dateUtils');
 
 /**
  * @desc    Save or update mood for a date

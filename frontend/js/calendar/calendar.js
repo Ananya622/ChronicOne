@@ -109,10 +109,18 @@ function initSidebarUserInfo(currentUser) {
 // 2. CALENDAR HEATMAP ENGINE
 // =========================================================================
 
+// Calendar date helper for Asia/Kolkata application timezone
+function getAppCalendarYearMonth(now = new Date()) {
+  const dateStr = typeof getTodayDate === 'function' ? getTodayDate(now) : new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  const [y, m] = dateStr.split('-').map(Number);
+  return { year: y, month: m - 1 };
+}
+
 // State
+const initialCalYm = getAppCalendarYearMonth();
 let calState = {
-  year: new Date().getFullYear(),
-  month: new Date().getMonth(), // 0 = Jan, 11 = Dec
+  year: initialCalYm.year,
+  month: initialCalYm.month, // 0 = Jan, 11 = Dec
   selectedDate: null
 };
 
@@ -153,9 +161,9 @@ function initCalendar() {
 
   if (btnTodayMonth) {
     btnTodayMonth.addEventListener('click', () => {
-      const now = new Date();
-      calState.year = now.getFullYear();
-      calState.month = now.getMonth();
+      const ym = getAppCalendarYearMonth();
+      calState.year = ym.year;
+      calState.month = ym.month;
       renderCalendar();
     });
   }
@@ -276,10 +284,10 @@ function renderMonthGrid(year, month, rawCheckIns, userHabits) {
 
   const todayDateStr = typeof getTodayDate === 'function' ? getTodayDate() : new Date().toISOString().slice(0, 10);
 
-  // Calculate month boundaries
-  const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
-  const daysInPrevMonth = new Date(year, month, 0).getDate();
-  const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  // Calculate month boundaries in UTC
+  const daysInCurrentMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const daysInPrevMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const firstDayOfWeek = new Date(Date.UTC(year, month, 1)).getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
 
   // Monday-first offset calculation (0 = Monday, 6 = Sunday)
   const startOffset = (firstDayOfWeek + 6) % 7;
