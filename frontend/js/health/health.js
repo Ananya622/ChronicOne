@@ -126,6 +126,24 @@ function openAddReadingModal(preselectedType = '') {
   modalAddReading.classList.add('active');
 }
 
+/**
+ * Strictly parses and validates a biomarker numeric value.
+ * Accepts only finite numbers or non-empty numeric strings.
+ * Rejects partial strings (e.g., '120abc', 'abc120'), empty/whitespace strings, NaN, Infinity.
+ * Returns the parsed finite number, or null if invalid.
+ */
+function parseStrictBiomarkerValue(input) {
+  if (input === null || input === undefined) return null;
+  if (typeof input === 'number') {
+    return Number.isFinite(input) ? input : null;
+  }
+  if (typeof input !== 'string') return null;
+  const trimmed = input.trim();
+  if (trimmed === '') return null;
+  const num = Number(trimmed);
+  return Number.isFinite(num) ? num : null;
+}
+
 // Initializes the Health Modal event listeners
 function initHealthModule() {
   const modalAddReading = document.getElementById('modalAddReading');
@@ -161,14 +179,38 @@ function initHealthModule() {
       if (!currentUser) return;
 
       const type = modalBiomarkerType.value;
-      const val = parseFloat(document.getElementById('modalBiomarkerValue').value);
-      const unit = modalBiomarkerUnit ? modalBiomarkerUnit.value : '';
-
-      if (isNaN(val)) {
-        if (typeof showToast === 'function') showToast('Please enter a valid numeric value', 'error');
+      const rawVal = document.getElementById('modalBiomarkerValue')?.value;
+      if (rawVal === undefined || rawVal === null || (typeof rawVal === 'string' && rawVal.trim() === '')) {
+        if (typeof showToast === 'function') showToast('Please enter a measurement value.', 'error');
         return;
       }
 
+      const val = parseStrictBiomarkerValue(rawVal);
+      if (val === null) {
+        if (typeof showToast === 'function') showToast('Please enter a valid numeric value.', 'error');
+        return;
+      }
+
+      // Technical boundary validation before submitting
+      const INPUT_BOUNDS = {
+        bloodGlucose: { min: 20, max: 1000, name: 'Blood Glucose', unit: 'mg/dL' },
+        bloodPressure: { min: 40, max: 300, name: 'Blood Pressure', unit: 'mmHg' },
+        heartRate: { min: 30, max: 250, name: 'Heart Rate', unit: 'bpm' },
+        peakFlow: { min: 50, max: 900, name: 'Peak Flow', unit: 'L/min' },
+        jointPain: { min: 0, max: 10, name: 'Joint Pain Level', unit: '/ 10' },
+        weight: { min: 10, max: 500, name: 'Body Weight', unit: 'kg' },
+        sleepHours: { min: 0, max: 24, name: 'Sleep Duration', unit: 'hrs' }
+      };
+
+      const bounds = INPUT_BOUNDS[type];
+      if (bounds && (val < bounds.min || val > bounds.max)) {
+        if (typeof showToast === 'function') {
+          showToast(`${bounds.name} must be between ${bounds.min} and ${bounds.max} ${bounds.unit}.`, 'error');
+        }
+        return;
+      }
+
+      const unit = modalBiomarkerUnit ? modalBiomarkerUnit.value : '';
       const todayDate = typeof getTodayDate === 'function' ? getTodayDate() : new Date().toISOString().slice(0, 10);
       const btnSubmit = formAddReadingModal.querySelector('button[type="submit"]');
       const originalBtnText = btnSubmit ? btnSubmit.textContent : 'Save Reading';
@@ -234,4 +276,15 @@ if (typeof window !== 'undefined') {
   window.renderHealthBiomarkers = renderHealthBiomarkers;
   window.openAddReadingModal = openAddReadingModal;
   window.initHealthModule = initHealthModule;
+  window.parseStrictBiomarkerValue = parseStrictBiomarkerValue;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    BIOMARKER_DEFINITIONS,
+    getRequiredBiomarkersForUser,
+    renderHealthBiomarkers,
+    openAddReadingModal,
+    initHealthModule,
+    parseStrictBiomarkerValue
+  };
 }
