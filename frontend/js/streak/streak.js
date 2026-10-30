@@ -95,15 +95,23 @@ function calculateStreak(user = null) {
     }
   });
 
-  // 3. Sort entries chronologically by calendar date ascending
+  // Helper to parse YYYY-MM-DD into UTC midnight timestamp
+  const parseUtcDate = (dateStr) => {
+    if (!dateStr || typeof dateStr !== 'string') return 0;
+    const parts = dateStr.slice(0, 10).split('-');
+    if (parts.length !== 3) return 0;
+    return Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  };
+
+  // 3. Sort entries chronologically by calendar date ascending using UTC
   const sortedEntries = Object.values(normalizedMap).sort((a, b) => {
-    return new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00');
+    return parseUtcDate(a.date) - parseUtcDate(b.date);
   });
 
   let runningStreak = 0;
   let bestStreak = 0;
   let graceDaysUsed = 0;
-  let prevDate = null;
+  let prevTimeUtc = null;
   let graceUsedToday = false;
 
   // Recovery & Bonus tracking
@@ -117,13 +125,13 @@ function calculateStreak(user = null) {
   // 4. Chronological streak, grace, relapse, and recovery evaluation
   for (let i = 0; i < sortedEntries.length; i++) {
     const entry = sortedEntries[i];
-    const currDate = new Date(entry.date + 'T00:00:00');
+    const currTimeUtc = parseUtcDate(entry.date);
 
     // Determine if this day was successful (FULL or PARTIAL)
     const classification = entry.classification || entry.status;
     const isSuccess = (classification === 'FULL' || classification === 'PARTIAL');
 
-    if (prevDate === null) {
+    if (prevTimeUtc === null) {
       // First recorded check-in day
       if (isSuccess) {
         runningStreak = 1;
@@ -134,8 +142,8 @@ function calculateStreak(user = null) {
         inRelapse = false;
       }
     } else {
-      // Calculate difference in calendar days between check-ins
-      const diffTime = currDate.getTime() - prevDate.getTime();
+      // Calculate difference in calendar days between check-ins using UTC
+      const diffTime = currTimeUtc - prevTimeUtc;
       const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
       // Handle missing calendar days between records
@@ -225,7 +233,7 @@ function calculateStreak(user = null) {
       bestStreak = runningStreak;
     }
 
-    prevDate = currDate;
+    prevTimeUtc = currTimeUtc;
   }
 
   const currentStreak = runningStreak;
