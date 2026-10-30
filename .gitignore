@@ -24,3 +24,9 @@ Thumbs.db
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# Local Postman collections & testing guides (local-only)
+postman/
+*.postman_collection.json
+README_TESTING_GUIDE.md
+
