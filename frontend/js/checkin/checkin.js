@@ -65,7 +65,8 @@ function openCheckInModal(targetHabitId = null) {
   const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   if (!currentUser) return;
 
-  const userHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+  const rawHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+  const userHabits = Array.from(new Set(rawHabits));
   const rawTodayCheckIn = typeof getTodayCheckIn === 'function' ? getTodayCheckIn(currentUser) : null;
   const todayCheckIn = normalizeCheckIn(rawTodayCheckIn, userHabits);
   const habitsList = document.getElementById('modalHabitsChecklist');
@@ -189,7 +190,8 @@ function updateModalLiveScore() {
   const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   if (!currentUser) return;
 
-  const userHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+  const rawHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+  const userHabits = Array.from(new Set(rawHabits));
   if (userHabits.length === 0) return;
 
   const habitsObj = {};
@@ -265,7 +267,8 @@ function initCheckinModal() {
       const today = typeof getTodayDate === 'function' ? getTodayDate() : new Date().toISOString().slice(0, 10);
       const notesInput = document.getElementById('modalCheckinNotes');
       const notesVal = notesInput ? notesInput.value.trim() : '';
-      const userHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+      const rawHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+      const userHabits = Array.from(new Set(rawHabits));
 
       if (userHabits.length === 0) {
         if (typeof showToast === 'function') showToast('No habits configured to check in.', 'error');

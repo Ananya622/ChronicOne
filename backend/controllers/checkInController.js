@@ -23,26 +23,62 @@ const createOrUpdateCheckIn = async (req, res) => {
       return res.status(400).json({ error: 'Date must be formatted as YYYY-MM-DD.' });
     }
 
-    if (!habits || typeof habits !== 'object') {
+    const today = getTodayDateString();
+    if (checkInDate > today) {
+      return res.status(400).json({ error: 'Cannot log check-in for a future date.' });
+    }
+
+    if (!habits || typeof habits !== 'object' || Array.isArray(habits)) {
       return res.status(400).json({ error: 'Habits object is required.' });
     }
 
+    const habitEntries = Object.entries(habits);
+    if (habitEntries.length === 0) {
+      return res.status(400).json({ error: 'At least one habit must be provided.' });
+    }
+
+    const validatedHabits = {};
+    for (const [habitId, score] of habitEntries) {
+      if (typeof habitId !== 'string' || !habitId.trim()) {
+        return res.status(400).json({ error: 'Invalid habit identifier.' });
+      }
+      if (typeof score !== 'number' && typeof score !== 'string') {
+        return res.status(400).json({
+          error: `Score for habit '${habitId}' must be a numeric value between 0 and 1.`
+        });
+      }
+      if (typeof score === 'string' && score.trim() === '') {
+        return res.status(400).json({
+          error: `Score for habit '${habitId}' cannot be empty.`
+        });
+      }
+      const num = Number(score);
+      if (!Number.isFinite(num) || num < 0 || num > 1) {
+        return res.status(400).json({
+          error: `Invalid score for habit '${habitId}'. Must be a finite number between 0 and 1.`
+        });
+      }
+      validatedHabits[habitId.trim()] = Math.round(num * 100) / 100;
+    }
+
     // Auto-calculate daily score and day classification
-    const dailyScore = calculateDailyScore(habits);
+    const dailyScore = calculateDailyScore(validatedHabits);
     const classification = classifyDay(dailyScore);
 
     // Upsert: updates existing same-day record in-place, or creates new if none exists
     const existingCheckIn = await CheckIn.findOne({ user: req.user._id, date: checkInDate });
     const isUpdate = !!existingCheckIn;
 
+    const sanitizedNotes = notes !== undefined ? String(notes).trim().slice(0, 1000) : (existingCheckIn ? existingCheckIn.notes : '');
+
     const checkIn = await CheckIn.findOneAndUpdate(
       { user: req.user._id, date: checkInDate },
       {
-        habits,
+        habits: validatedHabits,
         dailyScore,
         classification,
         status: classification,
-        notes: notes !== undefined ? notes : (existingCheckIn ? existingCheckIn.notes : '')
+        notes: sanitizedNotes
       },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     );

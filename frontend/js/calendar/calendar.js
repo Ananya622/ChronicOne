@@ -194,7 +194,8 @@ function renderCalendar() {
   if (!currentUser) return;
 
   const rawCheckIns = typeof getUserCheckIns === 'function' ? getUserCheckIns(currentUser) : [];
-  const userHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+  const rawHabits = typeof getEffectiveUserHabits === 'function' ? getEffectiveUserHabits(currentUser) : (currentUser.habits || []);
+  const userHabits = Array.from(new Set(rawHabits));
 
   // Update Month Header Label
   const monthDisplay = document.getElementById('currentMonthYearDisplay');
@@ -467,12 +468,13 @@ function openDayDetailsModal(dateStr, checkIn, day, month, year, userHabits = []
       statusLabel = 'Missed Routine';
     }
 
-    // Habit breakdown HTML
-    const habitKeys = Object.keys(habitsData).length > 0 ? Object.keys(habitsData) : userHabits;
+    // Habit breakdown HTML (deduplicate and handle empty states)
+    const rawKeys = Object.keys(habitsData).length > 0 ? Object.keys(habitsData) : userHabits;
+    const habitKeys = Array.from(new Set(rawKeys));
     let habitsListHtml = '';
 
     if (habitKeys.length === 0) {
-      habitsListHtml = `<div class="day-notes-empty">No habit details recorded.</div>`;
+      habitsListHtml = `<div class="day-notes-empty">No habit details recorded for this date.</div>`;
     } else {
       habitKeys.forEach(hId => {
         const meta = window.HABIT_CATALOG ? window.HABIT_CATALOG.find(h => h.id === hId) : null;
@@ -484,7 +486,8 @@ function openDayDetailsModal(dateStr, checkIn, day, month, year, userHabits = []
         let badgeStyleClass = '';
 
         if (rawVal !== undefined && rawVal !== null) {
-          const numericPct = Math.round(Number(rawVal) * 100);
+          const num = Number(rawVal);
+          const numericPct = Number.isFinite(num) ? Math.min(100, Math.max(0, Math.round(num * 100))) : 0;
           pctDisplay = `${numericPct}%`;
           if (numericPct === 100) badgeStyleClass = 'full';
           else if (numericPct >= 50) badgeStyleClass = 'partial';
