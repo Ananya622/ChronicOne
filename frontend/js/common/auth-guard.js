@@ -14,9 +14,17 @@ async function requireAuth() {
       return user;
     }
     // Restore session from HttpOnly cookie on page load / refresh
-    user = await window.api.checkAuth();
-    if (user) {
-      return user;
+    try {
+      user = await window.api.checkAuth();
+      if (user) {
+        return user;
+      }
+    } catch (error) {
+      console.warn('Network connectivity issue during authentication check:', error.message || error);
+      if (typeof showToast === 'function') {
+        showToast('Temporary network issue connecting to server. Retrying session...', 'info');
+      }
+      return null;
     }
   }
 
