@@ -27,6 +27,14 @@ function classifyDay(score) {
   return 'MISSED';
 }
 
+// Helper to parse YYYY-MM-DD into UTC midnight timestamp
+function parseUtcDate(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return 0;
+  const parts = dateStr.slice(0, 10).split('-');
+  if (parts.length !== 3) return 0;
+  return Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+}
+
 function calculateStreak(checkIns, todayDate = new Date().toISOString().slice(0, 10)) {
   const maxGraceDays = 2;
   const recoveryGoal = 3;
@@ -59,15 +67,15 @@ function calculateStreak(checkIns, todayDate = new Date().toISOString().slice(0,
     }
   });
 
-  // 2. Sort chronologically ascending
+  // 2. Sort chronologically ascending using UTC date arithmetic
   const sortedEntries = Object.values(normalizedMap).sort((a, b) => {
-    return new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00');
+    return parseUtcDate(a.date) - parseUtcDate(b.date);
   });
 
   let runningStreak = 0;
   let bestStreak = 0;
   let graceDaysUsed = 0;
-  let prevDate = null;
+  let prevTimeUtc = null;
   let graceUsedToday = false;
 
   let inRelapse = false;
@@ -79,12 +87,12 @@ function calculateStreak(checkIns, todayDate = new Date().toISOString().slice(0,
 
   for (let i = 0; i < sortedEntries.length; i++) {
     const entry = sortedEntries[i];
-    const currDate = new Date(entry.date + 'T00:00:00');
+    const currTimeUtc = parseUtcDate(entry.date);
 
     const classification = entry.classification || entry.status;
     const isSuccess = classification === 'FULL' || classification === 'PARTIAL';
 
-    if (prevDate === null) {
+    if (prevTimeUtc === null) {
       if (isSuccess) {
         runningStreak = 1;
         inRelapse = false;
@@ -93,7 +101,7 @@ function calculateStreak(checkIns, todayDate = new Date().toISOString().slice(0,
         inRelapse = false;
       }
     } else {
-      const diffTime = currDate.getTime() - prevDate.getTime();
+      const diffTime = currTimeUtc - prevTimeUtc;
       const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
       // Handle missing calendar days
@@ -174,7 +182,7 @@ function calculateStreak(checkIns, todayDate = new Date().toISOString().slice(0,
       bestStreak = runningStreak;
     }
 
-    prevDate = currDate;
+    prevTimeUtc = currTimeUtc;
   }
 
   const currentStreak = runningStreak;

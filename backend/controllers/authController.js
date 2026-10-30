@@ -38,24 +38,34 @@ const register = async (req, res) => {
       return res.status(400).json({ error: 'Name, email, and password are required.' });
     }
 
-    if (password.length < 6) {
+    const trimmedName = String(name).trim();
+    if (trimmedName.length < 2 || trimmedName.length > 100) {
+      return res.status(400).json({ error: 'Name must be between 2 and 100 characters long.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const normalizedEmail = String(email).trim().toLowerCase();
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ error: 'Please provide a valid email address.' });
+    }
+
+    if (String(password).length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(409).json({ error: 'An account with this email already exists.' });
     }
 
     const user = await User.create({
-      name: name.trim(),
+      name: trimmedName,
       email: normalizedEmail,
-      password,
-      conditions: Array.isArray(conditions) ? conditions : [],
-      habits: Array.isArray(habits) ? habits : [],
-      theme: theme || 'dark',
-      preferences: preferences || {}
+      password: String(password),
+      conditions: Array.isArray(conditions) ? conditions.map(c => String(c).trim()).filter(Boolean) : [],
+      habits: Array.isArray(habits) ? habits.map(h => String(h).trim()).filter(Boolean) : [],
+      theme: theme === 'light' ? 'light' : 'dark',
+      preferences: (preferences && typeof preferences === 'object') ? preferences : {}
     });
 
     const token = generateToken(user._id);
@@ -159,10 +169,16 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    if (name) user.name = name.trim();
+    if (name !== undefined) {
+      const trimmedName = String(name).trim();
+      if (trimmedName.length < 2 || trimmedName.length > 100) {
+        return res.status(400).json({ error: 'Name must be between 2 and 100 characters long.' });
+      }
+      user.name = trimmedName;
+    }
     if (theme && ['dark', 'light'].includes(theme)) user.theme = theme;
-    if (Array.isArray(conditions)) user.conditions = conditions;
-    if (Array.isArray(habits)) user.habits = habits;
+    if (Array.isArray(conditions)) user.conditions = conditions.map(c => String(c).trim()).filter(Boolean);
+    if (Array.isArray(habits)) user.habits = habits.map(h => String(h).trim()).filter(Boolean);
     if (preferences && typeof preferences === 'object') {
       user.preferences = { ...(user.preferences || {}), ...preferences };
     }
